@@ -27,14 +27,13 @@ export const postUser = async (parent: any, args: any) => {
   const { email, password } = newArgs;
   if (await Account.findOne({ email })) { throw new Error('User already exists'); }
 
-  const origin = `${process.env.API_URL}:${process.env.PORT}` || '';
   const account = new Account(newArgs);
   account.verificationToken = randomTokenString();
   account.password = hashPassword(password);
 
   await account.save();
 
-  await sendVerificationEmail(account, origin);
+  await sendVerificationEmail(account);
   return account;
 };
 

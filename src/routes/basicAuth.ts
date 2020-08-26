@@ -15,13 +15,12 @@ import verifyUserRole from '../middleware/verifyUserRole';
 const router = Router();
 router.post('/login', login);
 router.post('/register', register);
-router.post('/verify-email', verifyEmail);
+router.get('/verify-email', verifyEmail);
 router.post('/refresh-token', refreshToken);
 router.post('/forgot-password', forgotPassword);
 router.post('/change-password', changePassword);
 router.post('/validate-reset-token', validateResetToken);
 router.get('/', [verifyToken, verifyUserRole(['Admin', 'Editor'])], test);
-
 // router.post('/revoke-token', revokeToken); // Esta necesita ser validada con autorizacion
 
 export default router;

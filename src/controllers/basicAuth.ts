@@ -70,7 +70,7 @@ export const forgotPassword = async (request: Request, response: Response) => {
     token: randomTokenString(),
   };
   await user.save();
-  await sendPasswordResetEmail(user, request.get('origin') || '');
+  await sendPasswordResetEmail(user);
   return response.send({ success: 'Please check your email for password reset instructions' });
 };
 
@@ -81,14 +81,13 @@ export const register = async (request: Request, response: Response) => {
   const { email, password } = request.body;
   if (await Account.findOne({ email })) { return response.status(409).send({ error: 'user already exists' }); }
 
-  const origin = request.get('origin') || '';
   const account = new Account(request.body);
   account.verificationToken = randomTokenString();
   account.password = hashPassword(password);
 
   await account.save();
 
-  await sendVerificationEmail(account, origin);
+  await sendVerificationEmail(account);
   return response.status(200).send({ success: 'Registration successful, please check your email for verification instructions' });
 };
 
@@ -135,14 +134,12 @@ export const refreshToken = async (request: Request, response: Response) => {
 };
 
 export const verifyEmail = async (request: Request, response: Response) => {
-  const { token } = request.body;
-  const { error } = verifyEmailValidation(request.body);
+  const { token } = request.query;
+  const { error } = verifyEmailValidation({ token });
 
   if (error) { return response.status(400).send({ error: error.details[0].message }); }
-
-  const user = await Account.findOne({ verificationToken: token });
-
-  if (!user) { return response.status(404).send({ error: 'Verification failed' }); }
+  const user = await Account.findOne({ verificationToken: token?.toString() });
+  if (!user) { return response.status(404).send({ error: 'Invalid Token' }); }
 
   user.verified = Date.now();
   user.verificationToken = '';

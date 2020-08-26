@@ -4,7 +4,6 @@ const sgMail = require('@sendgrid/mail');
 
 const sendEmail = async (data: any) => {
   const apiKey = process.env.SENDGRID_API_KEY || '';
-
   sgMail.setApiKey(apiKey);
   const msg = {
     to: data.to,
@@ -20,15 +19,13 @@ const sendEmail = async (data: any) => {
   }
 };
 
-export const sendPasswordResetEmail = async (user: UserInterface, origin: string) => {
+export const sendPasswordResetEmail = async (user: UserInterface) => {
   let message;
-  if (origin && origin !== '') {
+  const origin = process.env.API_URL;
+  if (origin) {
     const resetUrl = `${origin}/authentication/change-password?token=${user.resetToken.token}`;
     message = `<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                    <p><a href="${resetUrl}">${resetUrl}</a></p>`;
-  } else {
-    message = `<p>Please use the below token to reset your password with the <code>/account/reset-password</code> api route:</p>
-                   <p><code>${user.resetToken.token}</code></p>`;
   }
 
   try {
@@ -43,15 +40,13 @@ export const sendPasswordResetEmail = async (user: UserInterface, origin: string
   }
 };
 
-export const sendVerificationEmail = async (user: UserInterface, origin: string) => {
+export const sendVerificationEmail = async (user: UserInterface) => {
   let message;
-  if (origin && origin !== '') {
-    const verifyUrl = `${origin}/account/verify-email?token=${user.verificationToken}`;
+  const origin = process.env.API_URL;
+  if (origin) {
+    const verifyUrl = `${origin}/authentication/verify-email?token=${user.verificationToken}`;
     message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;
-  } else {
-    message = `<p>Please use the below token to verify your email address with the <code>/account/verify-email</code> api route:</p>
-                   <p><code>${user.verificationToken}</code></p>`;
   }
 
   await sendEmail({
