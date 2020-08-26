@@ -1,0 +1,16 @@
+# import { User } from "User.graphql"
+
+scalar JSON
+scalar Date
+scalar Any
+
+type Query {
+  User(id: String!): User
+  Users: [User]
+}
+
+type Mutation {
+  postUser(firstName: String!, lastName: String!, email: String!, password: String!, confirmPassword: String!, acceptTerms: Boolean!, role: String!): User
+  deleteUser(id: String!): User
+  updateUser(id: String!, email: String, firstName: String, lastName: String, role: String, acceptTerms: Boolean): User
+}
